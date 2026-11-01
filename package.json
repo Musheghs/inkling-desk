@@ -1,0 +1,49 @@
+{
+  "name": "inkling-desk",
+  "version": "0.1.1",
+  "description": "A drawing desk for single-panel cartoons: steady pens, shapes, characters, things and places, speech bubbles and a typeset caption. No dependencies.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Mushegh Sirekanyan",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Musheghs/inkling-desk.git"
+  },
+  "homepage": "https://github.com/Musheghs/inkling-desk#readme",
+  "bugs": {
+    "url": "https://github.com/Musheghs/inkling-desk/issues"
+  },
+  "main": "./dist/inkling.mjs",
+  "module": "./dist/inkling.mjs",
+  "unpkg": "./dist/inkling.js",
+  "jsdelivr": "./dist/inkling.js",
+  "exports": {
+    ".": "./dist/inkling.mjs",
+    "./iife": "./dist/inkling.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "drawing",
+    "cartoon",
+    "comic",
+    "sketch",
+    "illustration",
+    "svg",
+    "canvas",
+    "web-component"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "format": "prettier --write src demo vite.config.js",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2",
+    "vite": "^5.4.21"
+  }
+}

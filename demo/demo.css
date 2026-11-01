@@ -1,0 +1,26 @@
+:root {
+  color-scheme: light dark;
+  --bg: #efeee9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161617;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+.desk {
+  display: block;
+  height: 100%;
+}
