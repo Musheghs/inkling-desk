@@ -1,6 +1,6 @@
 {
   "name": "inkling-desk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A drawing desk for single-panel cartoons: steady pens, shapes, characters, things and places, speech bubbles and a typeset caption. No dependencies.",
   "type": "module",
   "license": "MIT",
