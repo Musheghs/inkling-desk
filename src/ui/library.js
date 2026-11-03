@@ -37,7 +37,7 @@ import { THING_ORDER, THINGS } from "../parts/things.js";
 import { animate, chips, EASE, EASE_IN_OUT, EASE_OUT, h, reducedMotion, segmented, SPRING } from "./dom.js";
 import { icon } from "./icons.js";
 
-export function drawing(pieces, view, { colors, prefix, weight, paper = "#fffefa" }) {
+function drawing(pieces, view, { colors, prefix, weight, paper = "#fffefa" }) {
   const svg = el("svg", { viewBox: view, "aria-hidden": "true", focusable: "false", preserveAspectRatio: "xMidYMid meet" });
   for (const piece of pieces) {
     const g = pieceGeometry({ weight, flip: false, ...piece });

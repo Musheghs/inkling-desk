@@ -1,7 +1,6 @@
-import { bounds, dist, distToSegment, length, resample } from "./geometry.js";
+import { bounds, dist, distToSegment, length, resample, TAU } from "./geometry.js";
 import { noise, rng } from "./random.js";
 
-const TAU = Math.PI * 2;
 const SNAP = Math.PI / 4;
 
 function snapAngle(angle, within) {

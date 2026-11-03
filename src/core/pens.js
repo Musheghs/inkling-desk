@@ -1,7 +1,7 @@
 import { clamp, dist, relax, resample, smoothstep } from "./geometry.js";
 import { outline } from "./outline.js";
 
-const taper = (d, len, floor) => (len <= 0 ? 1 : floor + (1 - floor) * Math.sqrt(clamp(d / len, 0, 1)));
+export const taper = (d, len, floor) => (len <= 0 ? 1 : floor + (1 - floor) * Math.sqrt(clamp(d / len, 0, 1)));
 
 export const PENS = {
   nib: {

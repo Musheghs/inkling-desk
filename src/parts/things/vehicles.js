@@ -1,12 +1,64 @@
-import { area, build, dot, flat, hideUnder, line, loop, oval, ovalRing, poly, segment } from "./kit.js";
-import { HOME_THINGS } from "./things4.js";
+import { area, build, dot, flat, hideUnder, line, loop, oval, ovalRing, poly, segment } from "../kit.js";
+import { arch, box, disc, shape, waterline } from "./draw.js";
 
-function shape(b, pts, { tone = 0, weight = 1, smooth = false, knock = true, part } = {}) {
-  const ring = smooth ? area(pts) : flat(pts, 4);
-  b.lines.push(smooth ? loop(pts, { weight, overlap: 0.03 }) : poly(pts, { closed: true, weight }));
-  if (tone) b.washes.push({ rings: [ring], tone, part });
-  if (knock) b.knock.push(ring);
-  return ring;
+function plainWheel(b, x, y, r) {
+  b.lines.push({ pts: oval(x, y, r, r, { start: -1.2 }), weight: 1 });
+  b.lines.push({ pts: oval(x, y, r * 0.42, r * 0.42), weight: 0.7 });
+  b.washes.push({ rings: [ovalRing(x, y, r, r)], tone: 0.62, part: "wheels" });
+  b.knock.push(ovalRing(x, y, r + 1, r + 1));
+}
+
+function jet(b, x, y, len = 46) {
+  b.lines.push(
+    poly(
+      [
+        [x - 10, y],
+        [x + 10, y],
+        [x + 7, y + 12],
+        [x - 7, y + 12],
+      ],
+      { closed: true, weight: 0.8 },
+    ),
+  );
+  b.washes.push({
+    rings: [
+      flat(
+        [
+          [x - 10, y],
+          [x + 10, y],
+          [x + 7, y + 12],
+          [x - 7, y + 12],
+        ],
+        3,
+      ),
+    ],
+    tone: 0.5,
+  });
+  b.lines.push(
+    line(
+      [
+        [x - 7, y + 14],
+        [x - 10, y + len * 0.55],
+        [x - 3, y + len * 0.4],
+        [x, y + len],
+        [x + 3, y + len * 0.4],
+        [x + 10, y + len * 0.55],
+        [x + 7, y + 14],
+      ],
+      { weight: 0.7 },
+    ),
+  );
+}
+
+function speed(b, x, ys, len = 40) {
+  for (const y of ys) b.lines.push(segment([x - len, y], [x, y], { weight: 0.45 }));
+}
+
+function tyre(b, x, y, r) {
+  b.lines.push({ pts: oval(x, y, r, r, { start: -1.2 }), weight: 1 });
+  b.lines.push({ pts: oval(x, y, r * 0.45, r * 0.45), weight: 0.7 });
+  b.washes.push({ rings: [ovalRing(x, y, r, r)], tone: 0.62, part: "wheels" });
+  b.knock.push(ovalRing(x, y, r + 1, r + 1));
 }
 
 function occlude(b, ring) {
@@ -48,13 +100,74 @@ function windows(b, x, y, w, h, n, gap, tone = 0.45) {
 
 function carWith(extra) {
   return () => {
-    const b = HOME_THINGS.car.build();
+    const b = VEHICLES.car.build();
     extra(b);
     return b;
   };
 }
 
 export const VEHICLES = {
+  car: {
+    label: "Car",
+    main: "Body",
+    parts: { windows: "Windows", wheels: "Wheels" },
+    words: "sedan automobile drive road",
+    zone: "floor",
+    build() {
+      const b = build();
+      const body = [
+        [-250, -40],
+        [-254, -92],
+        [-214, -106],
+        [-150, -112],
+        [-112, -170],
+        [-40, -184],
+        [64, -182],
+        [116, -122],
+        [204, -112],
+        [248, -94],
+        [254, -52],
+        [244, -38],
+      ]
+        .concat(arch(150, -38, 46))
+        .concat([
+          [104, -38],
+          [-104, -38],
+        ])
+        .concat(arch(-150, -38, 46))
+        .concat([[-196, -38]]);
+      b.lines.push(poly(body, { closed: true, weight: 1.05 }));
+      b.washes.push({ rings: [flat(body, 5)], tone: 0.2 });
+      for (const win of [
+        [
+          [-100, -164],
+          [-38, -174],
+          [-32, -118],
+          [-112, -118],
+        ],
+        [
+          [-14, -174],
+          [54, -172],
+          [94, -120],
+          [-10, -118],
+        ],
+      ]) {
+        b.lines.push(poly(win, { closed: true, weight: 0.8 }));
+        b.washes.push({ rings: [flat(win, 4)], tone: 0.5, part: "windows" });
+      }
+      b.lines.push(segment([-20, -118], [-22, -44], { weight: 0.6 }), segment([102, -112], [100, -50], { weight: 0.6 }));
+      b.lines.push(segment([-4, -100], [18, -100], { weight: 0.9 }), segment([118, -100], [138, -100], { weight: 0.9 }));
+      b.lines.push(
+        { pts: oval(236, -84, 9, 7), weight: 0.7 },
+        segment([-254, -62], [-226, -62], { weight: 1.2 }),
+        segment([228, -50], [256, -50], { weight: 1.2 }),
+      );
+      tyre(b, -150, -36, 36);
+      tyre(b, 150, -36, 36);
+      b.knock.push(flat(body));
+      return b;
+    },
+  },
   taxi: {
     label: "Taxi",
     main: "Body",
@@ -842,6 +955,54 @@ export const VEHICLES = {
       return b;
     },
   },
+  rowboat: {
+    label: "Rowboat",
+    words: "boat sea lost castaway oars",
+    zone: "line",
+    build() {
+      const b = build();
+      const hull = [
+        [-200, -80],
+        [200, -80],
+        [170, -20],
+        [120, 10],
+        [-120, 10],
+        [-170, -20],
+      ];
+      shape(b, hull, { tone: 0.3, smooth: true });
+      b.lines.push(
+        line(
+          [
+            [-190, -66],
+            [0, -60],
+            [190, -66],
+          ],
+          { weight: 0.5 },
+        ),
+      );
+      for (const d of [-1, 1])
+        b.lines.push(
+          poly(
+            [
+              [d * 60, -80],
+              [d * 160, 30],
+            ],
+            { weight: 0.9 },
+          ),
+          poly(
+            [
+              [d * 150, 20],
+              [d * 180, 44],
+              [d * 170, 54],
+              [d * 140, 30],
+            ],
+            { closed: true, weight: 0.75 },
+          ),
+        );
+      waterline(b, 280, 6);
+      return b;
+    },
+  },
   sailboat: {
     label: "Sailboat",
     words: "yacht sail boat sea regatta",
@@ -1121,6 +1282,122 @@ export const VEHICLES = {
       return b;
     },
   },
+  balloon: {
+    label: "Hot-air balloon",
+    main: "Balloon",
+    parts: { basket: "Basket" },
+    words: "sky flight basket",
+    zone: "sky",
+    build() {
+      const b = build();
+      const env = [
+        [0, -300],
+        [90, -270],
+        [130, -190],
+        [110, -100],
+        [40, -30],
+        [-40, -30],
+        [-110, -100],
+        [-130, -190],
+        [-90, -270],
+      ];
+      shape(b, env, { tone: 0.12, smooth: true });
+      for (const k of [-0.55, 0, 0.55])
+        b.lines.push(
+          line(
+            [
+              [0, -300],
+              [k * 130, -200],
+              [k * 60, -60],
+              [k * 40, -30],
+            ],
+            { weight: 0.5 },
+          ),
+        );
+      b.washes.push({
+        rings: [
+          area([
+            [0, -298],
+            [60, -260],
+            [70, -100],
+            [30, -32],
+            [-30, -32],
+            [-70, -100],
+            [-60, -260],
+          ]),
+        ],
+        tone: 0.3,
+      });
+      for (const d of [-1, 1]) b.lines.push(segment([d * 40, -30], [d * 28, 30], { weight: 0.6 }));
+      shape(b, box(-34, 30, 68, 50), { tone: 0.4, weight: 0.9, part: "basket" });
+      return b;
+    },
+  },
+  rocket: {
+    label: "Rocket",
+    words: "space launch moon",
+    zone: "sky",
+    build() {
+      const b = build();
+      const body = [
+        [0, -260],
+        [40, -200],
+        [50, -100],
+        [44, 0],
+        [-44, 0],
+        [-50, -100],
+        [-40, -200],
+      ];
+      shape(b, body, { tone: 0.08, smooth: true });
+      disc(b, 0, -150, 22, { tone: 0.5, weight: 0.85 });
+      for (const d of [-1, 1])
+        shape(
+          b,
+          [
+            [d * 44, -70],
+            [d * 90, -10],
+            [d * 86, 20],
+            [d * 44, 0],
+          ],
+          { tone: 0.5 },
+        );
+      shape(
+        b,
+        [
+          [-30, 0],
+          [30, 0],
+          [24, 20],
+          [-24, 20],
+        ],
+        { tone: 0.6, weight: 0.8 },
+      );
+      b.lines.push(
+        line(
+          [
+            [-20, 30],
+            [-30, 80],
+            [0, 60],
+            [10, 110],
+            [24, 60],
+            [34, 84],
+            [22, 30],
+          ],
+          { weight: 0.7 },
+        ),
+      );
+      b.lines.push(
+        line(
+          [
+            [-36, -220],
+            [0, -214],
+            [36, -220],
+          ],
+          { weight: 0.5 },
+        ),
+      );
+      return b;
+    },
+  },
   ufo: {
     label: "Flying saucer",
     words: "ufo alien spaceship saucer martian abduction",
@@ -1206,24 +1483,150 @@ export const VEHICLES = {
       return b;
     },
   },
+  flyingcar: {
+    label: "Flying car",
+    main: "Body",
+    parts: { windows: "Windows", wheels: "Wheels" },
+    zone: "sky",
+    build() {
+      const b = build();
+      const body = [
+        [-124, -8],
+        [-128, -30],
+        [-84, -38],
+        [-62, -66],
+        [14, -70],
+        [48, -42],
+        [116, -36],
+        [126, -18],
+        [120, -6],
+        [100, -6],
+        [96, -24],
+        [50, -24],
+        [46, -6],
+        [-56, -6],
+        [-60, -24],
+        [-104, -24],
+        [-108, -6],
+      ];
+      b.lines.push(loop(body, { weight: 1.05, overlap: 0.02, step: 2 }));
+      b.washes.push({ rings: [area(body)], tone: 0.22 });
+      const glass = [
+        [-56, -60],
+        [10, -64],
+        [36, -42],
+        [-66, -40],
+      ];
+      b.lines.push(poly(glass, { closed: true, weight: 0.75 }));
+      b.washes.push({ rings: [flat(glass, 4)], tone: 0.55, part: "windows" });
+      b.lines.push(segment([-14, -60], [-12, -40], { weight: 0.6 }), segment([-12, -38], [-10, -10], { weight: 0.5 }));
+      b.lines.push(
+        line(
+          [
+            [-96, -30],
+            [-150, -20],
+            [-100, -18],
+          ],
+          { weight: 0.85 },
+        ),
+      );
+      b.washes.push({
+        rings: [
+          area([
+            [-96, -30],
+            [-150, -20],
+            [-100, -18],
+          ]),
+        ],
+        tone: 0.4,
+      });
+      b.lines.push({ pts: oval(118, -26, 5, 4), weight: 0.6 });
+      plainWheel(b, -82, -6, 18);
+      plainWheel(b, 73, -6, 18);
+      b.lines.push(
+        poly(
+          [
+            [-134, -22],
+            [-128, -30],
+            [-128, -14],
+          ],
+          { weight: 0.7 },
+        ),
+      );
+      b.lines.push(
+        line(
+          [
+            [-140, -22],
+            [-164, -30],
+            [-176, -18],
+            [-196, -26],
+          ],
+          { weight: 0.6 },
+        ),
+        line(
+          [
+            [-140, -16],
+            [-170, -10],
+            [-188, -14],
+          ],
+          { weight: 0.5 },
+        ),
+      );
+      speed(b, -150, [-56, -44], 40);
+      b.knock.push(
+        area(body),
+        area([
+          [-96, -30],
+          [-150, -20],
+          [-100, -18],
+        ]),
+      );
+      return b;
+    },
+  },
+  flyingtruck: {
+    label: "Flying truck",
+    main: "Body",
+    parts: { windows: "Windows", wheels: "Wheels" },
+    zone: "sky",
+    build() {
+      const b = build();
+      const body = [
+        [-132, -10],
+        [-132, -46],
+        [-14, -82],
+        [130, -38],
+        [134, -12],
+        [124, -4],
+        [104, -4],
+        [100, -28],
+        [54, -28],
+        [50, -4],
+        [-58, -4],
+        [-62, -28],
+        [-108, -28],
+        [-112, -4],
+        [-128, -4],
+      ];
+      b.lines.push(poly(body, { closed: true, weight: 1.05 }));
+      b.washes.push({ rings: [flat(body, 5)], tone: 0.16 });
+      const glass = [
+        [-74, -50],
+        [-16, -70],
+        [64, -44],
+        [-70, -38],
+      ];
+      b.lines.push(poly(glass, { closed: true, weight: 0.75 }));
+      b.washes.push({ rings: [flat(glass, 4)], tone: 0.58, part: "windows" });
+      b.lines.push(segment([-8, -40], [-6, -8], { weight: 0.55 }), segment([-132, -22], [134, -22], { weight: 0.4 }));
+      b.lines.push(segment([110, -30], [132, -30], { weight: 0.9 }));
+      plainWheel(b, -85, -6, 21);
+      plainWheel(b, 77, -6, 21);
+      jet(b, -30, -2, 40);
+      jet(b, 22, -2, 40);
+      speed(b, -150, [-58, -40, -22], 46);
+      b.knock.push(flat(body));
+      return b;
+    },
+  },
 };
-
-export const VEHICLE_ORDER = [
-  "taxi",
-  "police",
-  "bus",
-  "truck",
-  "van",
-  "ambulance",
-  "motorbike",
-  "bicycle",
-  "scooter",
-  "skateboard",
-  "tractor",
-  "train",
-  "sailboat",
-  "submarine",
-  "plane",
-  "helicopter",
-  "ufo",
-];

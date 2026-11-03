@@ -1,3 +1,5 @@
+export const TAU = Math.PI * 2;
+
 export const dist = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
 
 export const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);

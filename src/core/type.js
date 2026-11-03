@@ -19,10 +19,10 @@ export function fontFor(faceId, size, families) {
   return { family, style, weight, size, upper: !!face.upper, css: `${style === "italic" ? "italic " : ""}${weight} ${size}px ${family}` };
 }
 
-export const shown = (text, font) => (font.upper ? text.toUpperCase() : text);
+const shown = (text, font) => (font.upper ? text.toUpperCase() : text);
 
 let measurer;
-export function measure(text, font) {
+function measure(text, font) {
   measurer ??= document.createElement("canvas").getContext("2d");
   measurer.font = font.css;
   return measurer.measureText(text).width;
@@ -30,7 +30,7 @@ export function measure(text, font) {
 
 export const LEADING = 1.22;
 
-export function wrap(text, font, maxWidth = Infinity) {
+function wrap(text, font, maxWidth = Infinity) {
   const lines = [];
   for (const para of shown(text, font).split("\n")) {
     const words = para.split(/(\s+)/).filter((w) => w.length);

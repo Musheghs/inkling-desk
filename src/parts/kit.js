@@ -1,6 +1,4 @@
-import { bounds, dist, pointInRing } from "../core/geometry.js";
-
-export const TAU = Math.PI * 2;
+import { bounds, dist, pointInRing, TAU } from "../core/geometry.js";
 
 const toPoint = (p) => (Array.isArray(p) ? { x: p[0], y: p[1], p: p[2] } : p);
 
@@ -69,17 +67,6 @@ export function oval(cx, cy, rx, ry, { start = -2.2, sweep = TAU, overlap = 0.22
 }
 
 export const ovalRing = (cx, cy, rx, ry, rot = 0) => oval(cx, cy, rx, ry, { overlap: 0, rot, step: 4 }).slice(0, -1);
-
-export const rect = (x, y, w, h) => [
-  { x, y },
-  { x: x + w, y },
-  { x: x + w, y: y + h },
-  { x, y: y + h },
-];
-
-export const shift = (pts, dx, dy) => pts.map((p) => ({ ...p, x: p.x + dx, y: p.y + dy }));
-
-export const mirror = (pts, axis = 0) => pts.map((p) => ({ ...p, x: 2 * axis - p.x }));
 
 export const straight = (a, b, step = 4) => {
   const n = Math.max(1, Math.ceil(dist(toPoint(a), toPoint(b)) / step));

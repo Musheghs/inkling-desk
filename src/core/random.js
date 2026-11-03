@@ -21,5 +21,3 @@ export function noise(seed) {
 }
 
 export const newSeed = () => (Math.random() * 2147483647) | 0;
-
-export const pick = (r, list) => list[Math.floor(r() * list.length) % list.length];

@@ -1,6 +1,6 @@
-import { clamp, dist, mergeShapes, resample } from "./geometry.js";
+import { clamp, dist, mergeShapes, resample, TAU } from "./geometry.js";
 import { outline } from "./outline.js";
-import { centerline, PENS, widen } from "./pens.js";
+import { centerline, PENS, taper, widen } from "./pens.js";
 import { noise, rng } from "./random.js";
 
 export const BRUSHES = [
@@ -20,10 +20,6 @@ export const BRUSHES = [
 ];
 
 export const brushOf = (id) => BRUSHES.find((b) => b.id === id) || BRUSHES[0];
-
-const TAU = Math.PI * 2;
-
-const taper = (d, len, floor) => (len <= 0 ? 1 : floor + (1 - floor) * Math.sqrt(clamp(d / len, 0, 1)));
 
 function signedArea(ring) {
   let a = 0;

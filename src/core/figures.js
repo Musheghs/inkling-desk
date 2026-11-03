@@ -1,4 +1,4 @@
-import { bounds, clamp, dist, mergeShapes, ringPath, shapeBounds, shapePath, union } from "./geometry.js";
+import { bounds, clamp, dist, mergeShapes, ringPath, shapeBounds, shapePath, TAU, union } from "./geometry.js";
 import { penShape } from "./pens.js";
 import { rng } from "./random.js";
 import { hand, sketchShape } from "./shapes.js";
@@ -31,7 +31,6 @@ export const FILLS = [
   { id: "solid", label: "Solid" },
 ];
 
-const TAU = Math.PI * 2;
 const OPEN = new Set(["line", "arrow"]);
 
 export const isOpenFigure = (id) => OPEN.has(id);

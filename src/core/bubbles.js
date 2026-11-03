@@ -1,5 +1,5 @@
 import { headGrow } from "../parts/people.js";
-import { bounds, clamp, dist, resample, union } from "./geometry.js";
+import { bounds, clamp, dist, resample, TAU, union } from "./geometry.js";
 import { sketchLoop } from "./figures.js";
 import { rng } from "./random.js";
 import { sketchShape } from "./shapes.js";
@@ -13,8 +13,6 @@ export const BUBBLES = [
   { id: "whisper", label: "Whisper" },
   { id: "box", label: "Box" },
 ];
-
-const TAU = Math.PI * 2;
 
 const cache = new WeakMap();
 
